@@ -1,0 +1,124 @@
+<?php 
+
+/**
+ * @file
+ * Examples demonstrating use json in Drupal.
+ */
+
+/**
+ * Implements hook_menu().
+ *
+ */
+
+function facebook_menu() {
+
+  $items = array();
+ 
+  $items['admin/Facebook'] = array(
+    'title' => 'Facebook  api',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('facebook_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 1,
+    );
+
+  return $items;
+}
+
+/**
+ *Implement hook_premission().
+ */
+
+function facebook_permission() {
+  return array(
+    'administer facebooks' => array(
+      'title' => t('Administer facebook'),
+      
+    ),
+    
+  );
+}
+
+/**
+ *Implement block_info().
+ */
+
+function facebook_block_info() {
+$blocks = array();
+  $blocks['facebook_api'] = array(
+
+    'info' => t('Facebook'),
+    'status' => TRUE,
+    'region' => 'sidebar_first',
+    'visibility' => BLOCK_VISIBILITY_NOTLISTED,
+    'cache' => DRUPAL_NO_CACHE,
+
+
+  );
+
+  return $blocks;
+
+}
+
+/**
+ * Implements hook_block_view().
+ */
+
+function facebook_block_view($delta) {
+
+  $block = array();
+
+  switch ($delta) {
+
+    case 'facebook_api':
+
+      $block['subject'] = t('Facebook api');
+
+      $block['content'] = array(
+            
+             '#markup' => facebook()
+           );
+
+      break;
+
+  }
+  return $block;
+
+}
+
+/**
+ *Implement hook_form() to page with settings.
+ */
+
+function facebook_form($form, &$form_state) {
+
+  $form['pageID'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Pages ID'),
+    '#size' => 20,
+    '#default_value' => '249013758490114',
+    '#maxlength' => 128,
+    '#description' => t('Enter Page ID your facebook page'),
+  );
+
+  return system_settings_form($form);
+
+}
+
+function facebook() {
+
+  $pageID = variable_get('pageID');
+  
+  $request = drupal_http_request('https://graph.facebook.com/' .$pageID);
+  $json = drupal_json_decode($request->data);
+  $output = '';
+  $output .= '<div id=facebok-name> Name Page <b>';
+  $output .= $json['name'];
+  $output .= '</b></div><div id=facebok-likes> Likes count <b>';
+  $output .= $json['likes'];
+  $output .= '</b></div>';
+  
+  return $output;
+}
+

@@ -1,0 +1,7 @@
+name = Ajax form
+description = Module implement ajax action in form
+package = Fromularz
+core = "7.x"
+version = "1"
+project = "formularz"
+

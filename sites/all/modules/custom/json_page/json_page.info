@@ -1,0 +1,5 @@
+name = Form Validacja
+description = Form Validacja
+core = 7.x
+version = 7.1
+package = "Form Validacja"

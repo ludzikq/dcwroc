@@ -1,0 +1,5 @@
+name = Facebook
+description = Facebook
+core = 7.x
+version = 7.1
+package = "Facebook"

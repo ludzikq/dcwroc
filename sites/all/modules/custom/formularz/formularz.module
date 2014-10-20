@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function formularz_menu() {
+
+  $items['przyklad_1'] = array(
+    'title' => 'Przyklad 1',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('formularz_form'),
+    'menu_name' => 'main-menu',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+
+  );
+
+  return $items;
+}
+
+
+function formularz_form($form, &$form_state) {
+
+	$form = array();
+
+	$form['przyklad_1_fieldset'] = array(
+	  '#type' => 'fieldset',
+	  '#title' => t('Przyklad 1'),
+	  '#collapsible' => TRUE,
+	  '#collapsed' => FALSE,
+	  '#prefix' => '<div id= ajax-callback>',
+	  '#sufix' => '</div>'
+	);
+
+	$form['przyklad_1_fieldset']['title'] = array(
+		'#type' => 'textfield', 
+		'#title' => t('Podaj imie i nazwisko'), 
+		'#default_value' => 'Piesek Leszek', 
+		'#size' => 20,
+		'#weight' => 1,
+	);
+
+	$form['przyklad_1_fieldset']['email'] = array(
+	  	'#type' => 'textfield', 
+		'#title' => t('podaj email'), 
+		'#default_value' => 'jacek@placek.pl', 
+		'#size' => 20,
+		'#weight' => 2,
+	);	
+
+	$form['dzieci'] = array(
+	'#type' => 'radios',
+	'#options' => array(
+	  'tak'   => t('tak'),
+	  'nie' => t('nie'),
+	),
+	'#title' => t('Masz dzieci ?'),
+	);
+
+	$form['syn'] = array(
+	'#type' => 'fieldset',
+	'#title' => t('Dzieci'),
+	'#states' => array(
+	  'visible' => array(
+	    ':input[name="dzieci"]' => array('value' => 'tak'),
+	  ),
+	),
+	);
+
+	$form['syn']['syn'] = array(
+	'#type' => 'checkboxes',
+	'#options' => array(
+	  'tak'   => t('tak'),
+	  'nie' => t('nie'),
+	),
+	'#title' => t('Masz syna ?'),
+	'#states' => array(
+	  'visible' => array(
+	    ':input[name="dzieci"]' => array('value' => 'tak'),
+	  ),
+	),
+	);
+
+	$form['syn']['imie_syn'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Podaj imie syna'),
+	'#size' => 4,
+	'#states' => array(
+	  'visible' => array(
+	    ':input[name="syn[tak]"]' => array('checked' => TRUE),
+	  ),
+	),
+	);
+
+	$form['syn']['corka'] = array(
+	'#type' => 'checkboxes',
+	'#options' => array(
+	  'tak'   => t('tak'),
+	  'nie' => t('nie'),
+	),
+	'#title' => t('Masz córka ?'),
+	'#states' => array(
+	  'visible' => array(
+	    ':input[name="dzieci"]' => array('value' => 'tak'),
+	  ),
+	),
+	);
+
+	$form['syn']['corka_imie'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Podaj imie corki'),
+	'#size' => 4,
+	'#states' => array(
+	  'visible' => array(
+	    ':input[name="corka[tak]"]' => array('checked' => TRUE),
+	  ),
+	),
+	);
+
+	$form['przyklad_1_fieldset']['fv'] = array(
+		'#type' =>'checkbox', 
+		'#title' => t('Chcę fakturę vat'),
+		'#default_value' => 0,
+		'#weight' => 3,
+		'#id' => 'fv',
+		'#ajax' => array(
+			'callback' => 'fv_callback',
+			'wrapper' => 'ajax-callback',
+			'effect' => 'slide',
+			'method' => 'replace',
+		),
+
+	);
+
+	return system_settings_form($form);
+
+
+}
+function fv_callback($form, $form_state) {
+
+	$form = array();
+
+	$form['przyklad_1_fieldset']['fv'] = array(
+		'#type' => 'textfield', 
+		'#title' => t('NIP'), 
+		'#size' => 20,
+		'#weight' => 1,
+	);
+
+	$commands[] = ajax_command_replace('#fv', drupal_render($form['przyklad_1_fieldset']['fv']));
+	return array('#type' => 'ajax', '#commands' => $commands);
+
+}

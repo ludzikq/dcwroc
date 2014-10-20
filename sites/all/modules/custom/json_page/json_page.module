@@ -1,0 +1,84 @@
+<?php 
+
+/**
+ * @file
+ * Examples demonstrating use json.
+ */
+
+ /**
+ * Implements hook_menu().
+ *
+ */
+function json_page_menu() {
+ 
+  $items = array();
+ 
+  $items['json_page'] = array(
+    'title' => 'json',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('json_page_form'),
+    'menu_name' => 'main-menu',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 1,
+    );
+  $items['json_page/json'] = array(
+    'page callback' => 'json_page_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    );
+
+  return $items;
+}
+
+function json_page_form($form, &$form_state) {
+
+  $form = array();
+
+  $form['#prefix'] = '<div id="formwrapper">';
+  $form['#suffix'] = '</div>';
+  $form['from'] = array(
+    '#type' => 'item',
+    '#title' => t('Pobierz'),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  $form['submit']['#ajax'] = array(
+    'callback' => 'json_page_submit',
+    'wrapper' => 'formwrapper',
+    'method' => 'replace',
+    'effect' => 'fade',
+  );
+
+  return $form;
+
+}
+
+function json_page_page() {
+
+  $array = array('Boat', 'Car', 'Ship', 'Building');
+    $output = drupal_json_encode($array);
+
+echo $output;
+
+
+
+}
+
+
+function json_page_submit($form, &$form_state) {
+
+  $request = drupal_http_request('http://www.camp.dd/json_page/json');
+  $json = drupal_json_decode($request->data);
+  $result = '<div id=facebok-name> Name Page <b>' . $json['name'] . '</b></div><div id=facebok-likes> Likes count <b>'.$json['likes'] . '</b></div>';
+  $output = array(
+
+    '#markup' => $result
+
+  );
+  return $output;
+}
+ 
